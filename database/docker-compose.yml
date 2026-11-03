@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: geotrack_db
+    environment:
+      POSTGRES_DB: geotrack_db
+      POSTGRES_USER: geotrack
+      POSTGRES_PASSWORD: geotrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geotrack -d geotrack_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgis_data:
+    driver: local
